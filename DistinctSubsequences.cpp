@@ -17,17 +17,14 @@ class Solution
 
 			//alloc & init
 			int *num = new int[src_len+1];
-			memset(num, 0, src_len+1);
-			//for (int i = 0; i <= src_len; ++i)
-			//{
-			//	num[i] = 0;
-			//}
+			memset(num, 0, sizeof(int) * (src_len+1));
 
 			//DP
 			int record = 1; //保存左上角的值
 			int tmp = 0; //新的值
 			for (int i = 1; i <= tar_len; ++i)
 			{
+				record = (1 == i ? 1 : 0); //模拟第一行为1的状态
 				for (int j = 1; j <= src_len; ++j)
 				{
 					if (tar[i-1] == src[j-1])
@@ -39,7 +36,7 @@ class Solution
 						tmp = num[j-1];
 					}
 
-					record = num[j];
+					record = (1 == i ? 1 : num[j]); //继续维持第一行为1
 					num[j] = tmp;
 				}
 			}
@@ -62,7 +59,7 @@ class Solution
 			for (int i = 0; i <= tar_len; ++i)
 			{
 				num[i] = new int[src_len+1];
-				memset(num[i], 0, src_len+1);
+				memset(num[i], 0, sizeof(int) * (src_len+1)); //memset int!
 			}	
 
 			//DP
