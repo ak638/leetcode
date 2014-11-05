@@ -9,6 +9,7 @@ using namespace std;
 
 /*
 动态规划
+真正的最大值(负数的绝对值)，会通过f(k)和g(k)交替保存下来！
 https://oj.leetcode.com/problems/maximum-product-subarray/solution/
 f(k) = max( f(k-1) * A[k], A[k], g(k-1) * A[k] )
 g(k) = min( g(k-1) * A[k], A[k], f(k-1) * A[k] )
