@@ -7,6 +7,12 @@
 
 using namespace std;
 
+/*
+动态规划
+https://oj.leetcode.com/problems/maximum-product-subarray/solution/
+f(k) = max( f(k-1) * A[k], A[k], g(k-1) * A[k] )
+g(k) = min( g(k-1) * A[k], A[k], f(k-1) * A[k] )
+*/
 
 class Solution {
 	public:
