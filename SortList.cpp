@@ -22,68 +22,68 @@ class Solution {
 		ListNode *sortList(ListNode *head) {
 			if (! head) return head;
 
-			int len = 0;
-			ListNode *cur = head;
+			QuickSort(&head, NULL);
 
-			//get length
-			while (cur)
-			{
-				len++;
-				cur = cur->next;
-			}
-
-			if (len <= 1) return head;
-
-			//init hash_map
-			ListNode **marr = new ListNode * [len];
-			cur = head;
-			int i = 0;
-			while (cur)
-			{
-				marr[i++] = cur;
-				cur = cur->next;
-			}
-
-			//do quick sort
-			quickSort(marr, 0, len-1);
-
-			delete[] marr;
-
-			return NULL;
+			return head;
 		}
 
-		void quickSort(ListNode *marr[], int beg, int end)
+		void AppendNode(ListNode **last, ListNode **head, ListNode *node)
 		{
-			if (beg < end)
+			if (*last) (*last)->next = node;
+			else 
 			{
-				int mid = Partition(marr, beg, end);
-				quickSort(marr, beg, mid-1);
-				quickSort(marr, mid+1, end);
+				*last = node;
+				*head = node;
 			}
 		}
 
-		void _swap(ListNode *marr[], int i, int j)
+		void QuickSort(ListNode **head, ListNode **end)
 		{
-			marr[i]->val ^= marr[j]->val ^= marr[i]->val ^= marr[j]->val;
-		}
+			if (! *head || ! (*head)->next) return;
 
-		int Partition(ListNode *marr[], int beg, int end)
-		{
-			int i = beg, j = end;
-			int pivot = marr[i]->val;
-
-			while (i < j)
-			{
-				while (marr[j]->val >= pivot && i < j) j--;
-				marr[i]->val = marr[j]->val;
-
-				while (marr[i]->val <= pivot && i < j) i++;
-				marr[j]->val = marr[i]->val;
-			}
-
-			marr[i]->val = pivot;
+			ListNode *pivot = *head;
+			ListNode *lt = NULL, *rt = NULL;
+			ListNode *lhead = NULL, *rhead = NULL;
+			ListNode **cur = head;
+			ListNode *tmp = NULL;
 			
-			return i;
+			while (*cur)
+			{
+				if ((*cur)->val < pivot->val)
+				{
+					AppendNode(&lt, &lhead, *cur);
+					lt = *cur;
+				}
+				else
+				{
+					AppendNode(&rt, &rhead, *cur);
+					rt = *cur;
+				}
+
+				tmp = *cur;
+				*cur = (*cur)->next;
+				tmp->next = NULL;
+			}
+
+			//divides into sorting two sides
+			QuickSort(&lhead, &lt);
+			//optimize this part
+			ListNode **ckp = &rhead->next;
+			while (*ckp && (*ckp)->val == rhead->val) ckp = &(*ckp)->next;
+			QuickSort(ckp, &rt); //skip pivot 
+			//QuickSort(&rhead->next, &rt);
+
+			//merge two lists
+			if (lhead) 
+			{
+				*head = lhead;
+				lt->next = rhead;
+			}
+			else *head = rhead;
+			//now pivot in middle
+
+			//set last node (in case of changes)
+			if (end) *end = rt;
 		}
 
 		void showArrayCont(ListNode *marr[], int num)
@@ -99,10 +99,10 @@ class Solution {
 		{
 			while (head)
 			{
-				printf("%d ", head->val);
+				printf("%d -> ", head->val);
 				head = head->next;
 			}
-			printf("\n");
+			printf("nil\n");
 		}
 
 		ListNode *initList(int arr[], int num)
@@ -122,49 +122,6 @@ class Solution {
 		}
 };
 
-void showArray(int arr[], int num)
-{
-	for (int i = 0; i < num; ++i) printf("%d ", arr[i]);
-	printf("\n");
-}
-
-void _swap(int arr[], int i, int j)
-{
-	arr[i] ^= arr[j] ^= arr[i] ^= arr[j];
-}
-
-void Partition(int arr[], int beg, int end)
-{
-	if (beg >= end) return;
-
-	int mid = (beg + end) / 2;
-	int pivot = arr[mid];
-	int i = beg, j = end;
-
-	//keep pivot in i first
-	if (i != mid) _swap(arr, i, mid);
-
-	while (i < j)
-	{
-		while (arr[j] > pivot && i < j) j--;
-		if (i < j) _swap(arr, i, j); //now pivot in j
-
-		while (arr[i] <= pivot && i < j) i++;
-		if (i < j) _swap(arr, i, j); //now pivot in i
-	}
-
-	Partition(arr, 0, i-1);
-	Partition(arr, i+1, end);
-}
-
-void quickSort(int arr[], int len)
-{
-	if (1 < len)
-	{
-		Partition(arr, 0, len-1);
-	}
-}
-
 int main(int argc, char *argv[])
 {
 	freopen("./input.txt", "r", stdin);
@@ -177,8 +134,9 @@ int main(int argc, char *argv[])
 	{
 		int num = 0;
 		scanf("%d", &num);
+		printf("==>%d\n", num);
 
-		int arr[20];
+		int arr[28238];
 		for (int i = 0; i < num; ++i) scanf("%d", &arr[i]);
 
 		ListNode *fake_head = poSolution.initList(arr, num);
@@ -186,10 +144,25 @@ int main(int argc, char *argv[])
 
 		poSolution.showArray(head);
 
-		poSolution.sortList(head);
+		ListNode * res = poSolution.sortList(head);
 
-		poSolution.showArray(head);
+		//poSolution.showArray(head);
+
+		printf("result...\n");
+		poSolution.showArray(res);
+
+		printf("\n");
 	}
 
 	return 0;
 }
+
+/**
+3
+9
+5 3 7 1 6 2 9 0 4
+11
+4 4 5 5 4 4 -1 2 5 3 6
+70
+-1 2 -2 1 -1 -2 1 -2 1 0 -1 2 -2 1 -1 -2 1 -2 1 0 -1 2 -2 1 -1 -2 1 -2 1 0 -1 2 -2 1 -1 -2 1 -2 1 0 -1 2 -2 1 -1 -2 1 -2 1 0 -1 2 -2 1 -1 -2 1 -2 1 0 -1 2 -2 1 -1 -2 1 -2 1 0
+*/
