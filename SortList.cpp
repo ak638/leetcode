@@ -67,7 +67,11 @@ class Solution {
 
 			//divides into sorting two sides
 			QuickSort(&lhead, &lt);
-			QuickSort(&rhead->next, &rt); //skip pivot 
+			//optimize this part
+			ListNode **ckp = &rhead->next;
+			while (*ckp && (*ckp)->val == rhead->val) ckp = &(*ckp)->next;
+			QuickSort(ckp, &rt); //skip pivot 
+			//QuickSort(&rhead->next, &rt);
 
 			//merge two lists
 			if (lhead) 
@@ -131,6 +135,7 @@ int main(int argc, char *argv[])
 	{
 		int num = 0;
 		scanf("%d", &num);
+		printf("==>%d\n", num);
 
 		int arr[200];
 		for (int i = 0; i < num; ++i) scanf("%d", &arr[i]);
