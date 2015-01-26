@@ -1,0 +1,203 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string>
+#include <stack>
+#include <queue>
+#include <vector>
+#include <set>
+#include <unordered_set>
+#include <map>
+#include <unordered_map>
+#include <string.h>
+#include <cmath>
+
+using namespace std;
+
+/**
+   * Definition for binary tree
+   * struct TreeNode {
+   *     int val;
+   *     TreeNode *left;
+   *     TreeNode *right;
+   *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+   * };
+ */
+struct TreeNode {
+	int val;
+	TreeNode *left;
+	TreeNode *right;
+	TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+};
+
+struct BuildNode {
+	TreeNode *node;
+	int state; //0 - init; 1 -left now; 2- right now 
+	BuildNode(TreeNode *_node, int _state=0) : node(_node), state(_state) {}
+};
+
+struct ShowNode {
+	TreeNode *node;
+	int indent; //show indent of tabs
+	int level; //BFS level
+	ShowNode(TreeNode *_node, int _indent=0, int _level=0) : node(_node), indent(_indent), level(_level) {}
+};
+
+class Solution {
+	public:
+		vector<int> postorderTraversal(TreeNode *root) {
+			
+			return vector<int>();
+		}
+
+		TreeNode *buildBinaryTree(vector<string> &vecStr)
+		{
+			TreeNode *root = NULL;
+
+			stack<BuildNode> skBuild;
+
+			for (size_t i = 0; i < vecStr.size(); ++i)
+			{
+				//backtrack when meets #
+				if (vecStr[i] == "#")
+				{
+					if (skBuild.empty()) break; //build done
+
+					while (skBuild.top().state == 2) //already right & meet end
+					{
+						skBuild.pop();
+						if (skBuild.empty()) break;
+					}
+
+					skBuild.top().state++; //move to right
+
+					continue;
+				}
+
+				int val = atoi(vecStr[i].c_str());	
+				TreeNode *newNode = new TreeNode(val);
+				
+				//link newNode to root tree
+				if (! skBuild.empty())
+				{
+					if (skBuild.top().state == 1) skBuild.top().node->left = newNode;
+					else skBuild.top().node->right = newNode;
+				}
+				else root = newNode;
+				
+				//prepare for next iteration
+				skBuild.push(BuildNode(newNode, 1));
+			}
+
+			return root;
+		}
+
+		void showSimpleTree(TreeNode *root)
+		{
+			if (! root) return;
+
+			queue<TreeNode *> queueNode;
+			queueNode.push(root);
+
+			while (queueNode.empty() == false)
+			{
+				if (queueNode.front()->left) 
+				{
+					printf("%d -> %d\n", queueNode.front()->val, queueNode.front()->left->val);
+					queueNode.push(queueNode.front()->left);
+				}
+				else
+				{
+					printf("%d -> #\n", queueNode.front()->val);
+				}
+
+				if (queueNode.front()->right) 
+				{
+					printf("%d -> %d\n", queueNode.front()->val, queueNode.front()->right->val);
+					queueNode.push(queueNode.front()->right);
+				}
+				else
+				{
+					printf("%d -> #\n", queueNode.front()->val);
+				}
+
+				queueNode.pop();
+			}
+		}
+		
+		int getMaxLeftIndent(TreeNode *root, int indent=1)
+		{
+			int ret = indent;
+			if (! root) return ret;
+
+			if (root->left) ret = max(getMaxLeftIndent(root->left, indent+1), ret);
+			if (root->right) ret = max(getMaxLeftIndent(root->right, indent-1), ret);
+
+			return ret;
+		}
+
+		void showTree(TreeNode *root)
+		{
+			if (! root) return;
+
+			int indent = getMaxLeftIndent(root);
+			printf("indent: %d\n", indent);
+			queue<ShowNode> queNodeBFS;
+			queNodeBFS.push(ShowNode(root, indent, 0));
+			int pre_level = -1;
+
+			while (! queNodeBFS.empty())
+			{
+				//print indent of current level once
+				if (pre_level != queNodeBFS.front().level) 
+				{
+					printf("\n");
+					for (int i = 0; i < queNodeBFS.front().indent; ++i) printf("\t");
+					pre_level = queNodeBFS.front().level;
+				}
+
+				if (queNodeBFS.front().node) printf("%d\t\t", queNodeBFS.front().node->val);
+				else printf("#\t\t");
+
+				//push left and right
+				if (queNodeBFS.front().node)
+				{
+					queNodeBFS.push(ShowNode(queNodeBFS.front().node->left, queNodeBFS.front().indent-1, queNodeBFS.front().level+1));
+					queNodeBFS.push(ShowNode(queNodeBFS.front().node->right, queNodeBFS.front().indent+1, queNodeBFS.front().level+1));
+				}
+
+				//pop parent
+				queNodeBFS.pop();
+			}
+			printf("\n");
+		}
+};
+
+int main(int argc, char *argv[])
+{
+	freopen("./input.txt", "r", stdin);
+	Solution poSolution;
+
+	int testcase = 0;
+	scanf("%d", &testcase);
+
+	while (testcase--)
+	{
+		int nodenum = 0;
+		scanf("%d", &nodenum);
+		char tmp[8];
+		vector<string> vecStr;
+
+		while (nodenum--)
+		{
+			scanf("%s", tmp);
+			vecStr.push_back(tmp);
+		}
+
+		TreeNode *root = poSolution.buildBinaryTree(vecStr);
+		poSolution.showSimpleTree(root);
+
+		poSolution.showTree(root);
+	}
+
+	return 0;
+}
