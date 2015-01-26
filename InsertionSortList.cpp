@@ -32,7 +32,51 @@ class Solution {
 		ListNode *insertionSortList(ListNode *head) {
 			/*
 				每次选择一个元素插入前面已经排好序的list里面
-				维护最后一个已排序的节点指针
+				维护第一个未排序节点的指针的指针
+				sorted | unsorted
+			*/
+			if (! head) return head;
+			
+			ListNode **firstUnsortNode = &head->next;
+				
+			while (*firstUnsortNode)
+			{
+				ListNode **targetPos = &head;
+
+				while (*targetPos != *firstUnsortNode && (*targetPos)->val < (*firstUnsortNode)->val)
+				{
+					targetPos = &(*targetPos)->next;
+				}
+
+				if (*targetPos != *firstUnsortNode) //the target position found
+				{
+					ListNode *one = *firstUnsortNode;
+					
+					//get one out
+					*firstUnsortNode = one->next;
+
+					//link next
+					one->next = *targetPos;
+
+					//adjust head(no need, because targetPos is pointer to pointer)
+					//if (head == *targetPos) head = one;
+
+					//put it in
+					*targetPos = one; //not targetPos = &one;
+				}
+				else //need not to move
+				{
+					firstUnsortNode = &(*firstUnsortNode)->next;
+				}
+			}
+
+			return head;
+		}
+
+		ListNode *insertionSortList_v1(ListNode *head) {
+			/*
+				每次选择一个元素插入前面已经排好序的list里面
+				维护最后一个已序的节点指针
 				sorted | unsorted
 			*/
 			if (! head) return head;
