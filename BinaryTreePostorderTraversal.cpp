@@ -45,8 +45,52 @@ struct ShowNode {
 class Solution {
 	public:
 		vector<int> postorderTraversal(TreeNode *root) {
+			/*
+			   退栈的时候才访问节点
+			 */
+			vector<int> res;
+			if (! root) return res;
+
+			stack<TreeNode *> stVisitNode;
+			stVisitNode.push(root);
+			TreeNode *cur = stVisitNode.top(); //当前处理的节点，用来辅助判断是否需要退栈或者往右继续下去
+			bool bShouldBt = false;
+
+			while (! stVisitNode.empty())
+			{
+				//keep going left direction
+				while (NULL != (cur = stVisitNode.top()->left)) stVisitNode.push(cur);
+
+				//if need backtrack
+				bShouldBt = false;
+
+				//decide next step: backtrack or go right side
+				if (stVisitNode.top()->right) //has right
+					stVisitNode.push(stVisitNode.top()->right);
+				else //no right side, should backtrack
+					bShouldBt = true;
+
+				//need backtrack
+				if (bShouldBt)
+				{
+					//keep pop util stack empty or (right child of top is not null and not processed)
+					do
+					{
+						cur = stVisitNode.top();
+						//visit it
+						res.push_back(cur->val);
+
+						stVisitNode.pop();
+					} while (! stVisitNode.empty() && (cur == stVisitNode.top()->right || NULL == stVisitNode.top()->right));
+
+					if (! stVisitNode.empty()) //right should be processed and not yet, then push right
+					{
+						stVisitNode.push(stVisitNode.top()->right);
+					}
+				}
+			}
 			
-			return vector<int>();
+			return res;
 		}
 
 		TreeNode *buildBinaryTree(vector<string> &vecStr)
@@ -197,6 +241,14 @@ int main(int argc, char *argv[])
 		poSolution.showSimpleTree(root);
 
 		poSolution.showTree(root);
+
+		vector<int> res = poSolution.postorderTraversal(root);
+		printf("\nRES: ");
+		for (size_t i = 0; i < res.size(); ++i)
+		{
+			printf("%d ", res[i]);
+		}
+		printf("\n");
 	}
 
 	return 0;
