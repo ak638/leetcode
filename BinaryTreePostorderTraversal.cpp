@@ -44,7 +44,55 @@ struct ShowNode {
 
 class Solution {
 	public:
+		vector<int> preorderTraversal(TreeNode *root) {
+			vector<int> res;
+			if (! root) return res;
+
+			stack<TreeNode *> stVisitNode;
+			stVisitNode.push(root);
+
+			while (! stVisitNode.empty())
+			{
+				TreeNode *cur = stVisitNode.top();
+				stVisitNode.pop();
+				
+				//visit
+				res.push_back(cur->val);
+
+				//pop left first for next iteration
+				if (cur->right) stVisitNode.push(cur->right);
+				if (cur->left) stVisitNode.push(cur->left);
+			}
+
+			return res;
+		}
+
 		vector<int> postorderTraversal(TreeNode *root) {
+			/*
+			   更为简洁的方式：利用每次插入结果数组第一个位置来制造后序遍历
+			 */
+			vector<int> res;
+			if (! root) return res;
+
+			stack<TreeNode *> stVisitNode;
+			stVisitNode.push(root);
+
+			while (! stVisitNode.empty())
+			{
+				TreeNode *cur = stVisitNode.top();
+				stVisitNode.pop();
+				
+				//visit, but in front, then as back in final result
+				res.insert(res.begin(), cur->val);
+
+				if (cur->left) stVisitNode.push(cur->left);
+				if (cur->right) stVisitNode.push(cur->right);
+			}
+
+			return res;
+		}
+
+		vector<int> postorderTraversal_v1(TreeNode *root) {
 			/*
 			   退栈的时候才访问节点
 			 */
@@ -242,7 +290,8 @@ int main(int argc, char *argv[])
 
 		poSolution.showTree(root);
 
-		vector<int> res = poSolution.postorderTraversal(root);
+		//vector<int> res = poSolution.postorderTraversal(root);
+		vector<int> res = poSolution.preorderTraversal(root);
 		printf("\nRES: ");
 		for (size_t i = 0; i < res.size(); ++i)
 		{
@@ -253,3 +302,9 @@ int main(int argc, char *argv[])
 
 	return 0;
 }
+
+/*
+1
+15
+1 # 2 3 4 5 # 6 # # 12 # 15 16 # #
+*/
