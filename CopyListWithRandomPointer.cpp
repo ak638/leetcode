@@ -30,51 +30,45 @@ struct RandomListNode {
 };
 
 class Solution {
-	public:
-		RandomListNode *copyRandomList(RandomListNode *head) {
-			if (! head) return NULL;
+    public:
+        RandomListNode *copyRandomList(RandomListNode *head) {
+            if (! head) return NULL;
 
-			RandomListNode *newHead = NULL;
-			RandomListNode **newCur = &newHead;
-			
-			//use unordered_map as hash_map better!
-			map<RandomListNode *, int> mapAddr2Idx;
-			vector<RandomListNode *> vecNewIdx2Addr;
+            RandomListNode *newHead = NULL;
+            RandomListNode **newCur = &newHead;
+    
+            vector<RandomListNode *> vecNewIdx2Addr;
 
-			int cnt = 0;
-			RandomListNode *oldCur = head;
-			while (oldCur)
-			{
-				*newCur = new RandomListNode(oldCur->label);
+            int cnt = 0;
+            RandomListNode *oldCur = head;
+            while (oldCur)
+            {   
+                *newCur = new RandomListNode(oldCur->label);
 
-				mapAddr2Idx[oldCur] = cnt;
-				vecNewIdx2Addr.push_back(*newCur);
+                (*newCur)->random = oldCur->random;
+                oldCur->label = cnt;
+                vecNewIdx2Addr.push_back(*newCur);
 
-				cnt += 1;
-				newCur = &(*newCur)->next;
-				oldCur = oldCur->next;
-			}
+                cnt += 1;
+                newCur = &(*newCur)->next;
+                oldCur = oldCur->next;
+            }   
 
-			int idx = 0;
-			oldCur = head;
-			newCur = &newHead;
-			while (oldCur)
-			{
-				if (oldCur->random)
-				{
-					idx = mapAddr2Idx[oldCur->random];
-					(*newCur)->random = vecNewIdx2Addr[idx];	
-				}
-				
-				newCur = &(*newCur)->next;
-				oldCur = oldCur->next;
-			}
+            for (newCur = &newHead; *newCur; newCur = &(*newCur)->next)
+            {   
+                if ((*newCur)->random) (*newCur)->random = vecNewIdx2Addr[(*newCur)->random->label];
+            }   
 
-			return newHead;
-		}
+            //recover label
+            cnt = 0;
+            for (oldCur = head; oldCur; oldCur = oldCur->next, cnt++)
+            {   
+                oldCur->label = vecNewIdx2Addr[cnt]->label;
+            }   
+
+            return newHead;
+        }   
 };
-
-using namespace std;
 
 int main(int argc, char *argv[])
 {
