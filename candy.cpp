@@ -20,13 +20,15 @@ using namespace std;
 class Solution {
 	public:
 		int candy(vector<int> &ratings) {
+			int max_cnt = (int)ratings.size();
+			if (max_cnt == 0) return 0;
+			
 			//greedy algo.
 			int res = 0;
 			int cur = 0; //上一个小孩首次分配的candy数
 			res += ++cur;
 			int last_high_idx = 0; //记录最近最大rating的下标
 			int last_high_val = cur; //记录最近最大rating下标首次分配的candy数
-			int max_cnt = (int)ratings.size();
 
 			for (int i = 1; i <= max_cnt; ++i)
 			{
