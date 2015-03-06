@@ -75,39 +75,31 @@ class Solution {
 			return res;
 		}
 
-		int canCompleteCircuit_v1(vector<int> &gas, vector<int> &cost) {
-			//TLE!
+		int canCompleteCircuit_v2(vector<int> &gas, vector<int> &cost) {
+			//accepted!
 			int res = -1;
-
 			int n = (int)gas.size();
-			vector<int> left(n, 0);
 
-			for (int i = 0; i < n; ++i)
-			{
-				left[i] = gas[i] - cost[i];
-			}
-
-			bool bFound = false;
+			int cur = 0;
+			int start = 0;
 			int sum = 0;
-			for (int i = 0; i < n; ++i)
-			{
-				bFound = true;
-				sum = 0;
-				for (int j = i, cnt = n; cnt > 0; j = (j+1) % n, cnt--)
-				{
-					sum += left[j];
-					if (sum < 0) 
-					{
-						bFound = false;
-						break;
-					}
-				}
+			int prestart = 0;
 
-				if (bFound)
+			//单向迭代，基于走过的不行的路径，都不可能为起点
+			while (1)
+			{
+				sum = 0;
+				for (int i = 0; i < n; ++i)
 				{
-					res = i;
-					break;
+					cur = (start + i) % n;
+					sum += gas[cur] - cost[cur];
+					if (sum < 0) break;
 				}
+				
+				if (sum >= 0) {res = start; break;}
+				prestart = start;
+				start = (cur + 1) % n; //接着从当前的下个station开始作为起点
+				if (start <= prestart) break; //如果start又跨过了0起点，意味着所有的节点都试过了
 			}
 
 			return res;
