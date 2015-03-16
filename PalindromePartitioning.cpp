@@ -50,6 +50,27 @@ class Solution {
 			return dp[n];
 		}
 		
+		int minCut_v2(string s) {
+			/*
+			 * 从一个字符开始向两边扩张，迭代出所有的回文组合，不需要存储
+			 */
+			int n = (int)s.size();
+			int dp[n+1];
+			for (int i = 0; i <= n; ++i) dp[i] = i - 1; //前i个字符最小cut
+
+			for (int i = 0; i < n; ++i)
+			{
+				//odd Palindrome
+				for (int j = 0; i-j >= 0 && i+j < n && s[i-j] == s[i+j]; ++j)
+					dp[i+j+1] = min(dp[i+j+1], dp[i-j]+1);
+				//even Palindrome
+				for (int j = 1; i-j+1 >= 0 && i+j < n && s[i-j+1] == s[i+j]; ++j)
+					dp[i+j+1] = min(dp[i+j+1], dp[i-j+1]+1);
+			}
+
+			return dp[n];
+		}
+		
 		vector<vector<string> > partition(string s) {
 			vector<vector<string> > res;
 			vector<string> single;
