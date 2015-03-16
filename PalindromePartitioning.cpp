@@ -38,7 +38,7 @@ class Solution {
 			{
 				for (int j = i-1; j >= 0; --j)
 				{
-					//s[j, i]
+					//s[j, i-1]
 					if (s[i-1] == s[j] && (i - j <= 2 || bPalin[j+1][i-1]))
 					{
 						bPalin[j][i] = true;
