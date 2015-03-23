@@ -19,6 +19,39 @@ using namespace std;
 
 class Solution {
 	public:
+		int longestConsecutive_v2(vector<int> &num)
+		{
+			//跟longestConsecutive想法类似，但是段不是靠段头和段尾去维持，而是段的每一个位置都用整个段长度表示，
+			//其实就也是利用到段头和段尾而已，中间不用维护
+			int size = (int)num.size();
+			if (size <=1 ) return size;
+
+			int res = 1;
+			//unordered_map<int, int> mapOcc;
+			//unordered_map<int, int>::iterator mit, mpreit, mpostit;
+			map<int, int> mapOcc; //记录所在连续段的长度
+			//map<int, int>::iterator mit, mpreit, mpostit;
+
+			for (int i = 0; i < size; ++i)
+			{
+				int cur = num[i];
+				if (mapOcc.find(cur) != mapOcc.end()) continue;
+
+				int left = cur == INT_MIN ? 0 : mapOcc.find(cur-1) == mapOcc.end() ? 0 : mapOcc[cur-1];
+				int right = cur == INT_MAX ? 0 : mapOcc.find(cur+1) == mapOcc.end() ? 0 : mapOcc[cur+1];
+
+				//合并连续段，0相当于没有连续段，一致对待
+				int sum = left + 1 + right;
+				mapOcc[cur] = sum;
+				res = max(res, sum);
+
+				//只需要更新连续段的头和尾就行
+				if (left != 0) mapOcc[cur-left] = sum;
+				if (right != 0) mapOcc[cur+right] = sum;
+			}
+
+			return res;
+		}
 		int longestConsecutive(vector<int> &num)
 		{
 			//注意边上只有一个节点，那么节点上原来的值需要先保存到临时变量！
