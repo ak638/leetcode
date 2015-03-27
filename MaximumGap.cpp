@@ -34,7 +34,7 @@ class Solution {
 				iMin = min(iMin, num[i]);
 			}
 
-			int iBkSize = n + 1;
+			int iBkSize = n;
 			int iInterval = (iMax - iMin) / iBkSize + 1; //each bucket range size
 
 			vector<vector<int> > vecBucket(iBkSize, vector<int>());
