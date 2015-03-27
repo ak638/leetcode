@@ -34,6 +34,51 @@ class Solution {
 				iMin = min(iMin, num[i]);
 			}
 
+			//利用一个特性，免除在bucket里面进行sort
+			//max_gap >= (iMax - iMin) / n !!
+			//这样就可以不用存同一个bucket里面的元素，只需要记录bucket的最大和最小值就可以
+			int iInterval = 1 + (iMax - iMin) / n; //桶中元素的max_gap，必定小于等于全部元素的max_gap的最小值, safe!
+			vector<int> vecMin(n, INT_MAX);
+			vector<int> vecMax(n, -1);
+
+			int max_gap = iInterval;
+
+			for (int i = 0; i < n; ++i)
+			{
+				int idx = (num[i] - iMin) / iInterval;
+				vecMin[idx] = min(num[i], vecMin[idx]);
+				vecMax[idx] = max(num[i], vecMax[idx]);
+			}
+
+			int last_max = -1;
+			for (int i = 0; i < n; ++i)
+			{
+				//cmp last max with this min
+				//可能中间有些bucket是空的，需要跳过
+				if (vecMin[i] == INT_MAX) continue;
+				if (last_max == -1) last_max = vecMax[i];
+				
+				max_gap = max(max_gap, vecMin[i] - last_max);
+				last_max = vecMax[i];
+			}
+			
+			return max_gap;
+		}
+		
+		int maximumGap_v1(vector<int> &num)
+		{
+			//bucket sort
+			int n = (int)num.size();
+			if (n < 2) return 0;
+
+			int iMax = num[0];
+			int iMin = num[0];
+			for (int i = 0; i < n; ++i)
+			{
+				iMax = max(iMax, num[i]);
+				iMin = min(iMin, num[i]);
+			}
+
 			int iBkSize = n;
 			int iInterval = (iMax - iMin) / iBkSize + 1; //each bucket range size
 
