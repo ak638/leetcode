@@ -37,6 +37,8 @@ class Solution {
 			//利用一个特性，免除在bucket里面进行sort
 			//max_gap >= (iMax - iMin) / n !!
 			//这样就可以不用存同一个bucket里面的元素，只需要记录bucket的最大和最小值就可以
+			//准确来说应该是(只有n-1个间隔)：
+			//int iInterval = (iMax - iMin) / (n - 1) + (iMax - iMin) % (n - 1) ? 1 : 0;
 			int iInterval = 1 + (iMax - iMin) / n; //桶中元素的max_gap，必定小于等于全部元素的max_gap的最小值, safe!
 			vector<int> vecMin(n, INT_MAX);
 			vector<int> vecMax(n, -1);
